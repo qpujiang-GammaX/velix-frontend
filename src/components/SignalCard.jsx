@@ -13,7 +13,6 @@ export default function SignalCard({ signal }) {
 
   const isBuy  = signal.signal_type === 'BUY'
   const color  = isBuy ? 'var(--green)' : 'var(--red)'
-  const dimBg  = isBuy ? 'var(--green-dim)' : 'var(--red-dim)'
   const modColor = MODULE_COLOR[signal.ai_module] || 'var(--orange-400)'
 
   const riskColor = { LOW: 'var(--green)', MEDIUM: 'var(--orange-400)', HIGH: 'var(--red)' }[signal.risk]

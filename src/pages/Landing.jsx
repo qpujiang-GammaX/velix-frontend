@@ -5,7 +5,7 @@ const FEATURES = [
   { icon: '⚡', title: 'Real-Time Signals', desc: 'Signals generated every hour with Entry, TP1, TP2 and Stop Loss levels.' },
   { icon: '📊', title: 'Market Heatmap', desc: 'Instant overview of trend direction and strength across all tracked pairs.' },
   { icon: '📡', title: 'Telegram Alerts', desc: 'Instant signal delivery to your phone via Telegram. Never miss a setup.' },
-  { icon: '🎯', title: 'RSI Alerts', desc: 'Automatic alerts when RSI hits extreme levels (30/70) on any pair.' },
+  { icon: '🎯', title: 'RSI Alerts', desc: 'Automatic alerts when RSI hits extreme levels (20/80) on any pair.' },
   { icon: '📈', title: 'Signal History', desc: 'Full track record of every signal with TP/SL results and win rate stats.' },
 ]
 

@@ -51,8 +51,8 @@ export default function MarketCard({ data }) {
           </span>
         </div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)', marginTop: 10 }}>
-          {data.rsi < 35 ? '🟢 RSI oversold — BUY setup may form' :
-           data.rsi > 65 ? '🔴 RSI overbought — SELL setup may form' :
+          {data.rsi <= 30 ? '🟢 RSI oversold — BUY setup may form' :
+           data.rsi >= 70 ? '🔴 RSI overbought — SELL setup may form' :
            '⚪ RSI neutral — monitoring for breakout'}
         </div>
       </div>

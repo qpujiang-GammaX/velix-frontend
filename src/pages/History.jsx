@@ -110,7 +110,7 @@ export default function History() {
       {/* History table */}
       <div style={{ background: 'var(--blue-800)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         {/* Table header */}
-        <div style={{
+        <div className="hist-row" style={{
           display: 'grid', gridTemplateColumns: '90px 60px 90px 1fr 1fr 90px 90px',
           gap: 12, padding: '12px 16px',
           borderBottom: '1px solid var(--border)',
@@ -136,7 +136,7 @@ export default function History() {
             const result = RESULT_STYLE[item.result] || RESULT_STYLE.OPEN
             const isBuy  = item.signal_type === 'BUY'
             return (
-              <div key={item.id} style={{
+              <div key={item.id} className="hist-row" style={{
                 display: 'grid', gridTemplateColumns: '90px 60px 90px 1fr 1fr 90px 90px',
                 gap: 12, padding: '12px 16px', alignItems: 'center',
                 borderBottom: i < history.length - 1 ? '1px solid rgba(30,64,128,0.3)' : 'none',
@@ -167,6 +167,13 @@ export default function History() {
           })
         )}
       </div>
+
+      <style>{`
+        @media (max-width: 700px) {
+          .hist-row { grid-template-columns: 70px 50px 70px 1fr 80px !important; }
+          .hist-row span:nth-child(5), .hist-row span:nth-child(7) { display: none; }
+        }
+      `}</style>
     </main>
   )
 }

@@ -3,6 +3,7 @@ import SignalCard from '../components/SignalCard'
 import HeatmapTable from '../components/HeatmapTable'
 import TradingChart from '../components/TradingChart'
 import MarketCard from '../components/MarketCard'
+import AIRadar from '../components/AIRadar'
 
 const API = import.meta.env.VITE_API_URL || 'https://gammax-backend-production.up.railway.app'
 const PAIRS = ['XAU/USD', 'EUR/USD', 'GBP/USD', 'USD/JPY', 'USOIL', 'US500']
@@ -112,7 +113,7 @@ export default function Dashboard() {
           </div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 300px', gap: 20 }}>
+        <div className="dash-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 300px', gap: 20 }}>
 
           {/* Left */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -233,6 +234,8 @@ export default function Dashboard() {
               </div>
             )}
 
+            <AIRadar data={heatmap} />
+
             <HeatmapTable data={heatmap} activePair={activePair} onSelect={setActivePair} />
           </div>
         </div>
@@ -240,7 +243,7 @@ export default function Dashboard() {
 
       <style>{`
         @media (max-width: 768px) {
-          main > div:last-child { grid-template-columns: 1fr !important; }
+          .dash-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </main>

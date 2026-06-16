@@ -4,7 +4,7 @@ export default function AIRadar({ data }) {
   // Calculate "distance to extreme" for each pair
   const radar = data.map(item => {
     const rsi = item.rsi
-    let distance, zone, direction
+    let distance, direction
     if (rsi <= 50) {
       distance = rsi - 20   // how far above the BUY trigger (20)
       direction = 'BUY'
@@ -12,6 +12,7 @@ export default function AIRadar({ data }) {
       distance = 80 - rsi   // how far below the SELL trigger (80)
       direction = 'SELL'
     }
+    let zone
     if (distance <= 0) zone = 'TRIGGERED'
     else if (distance <= 10) zone = 'CLOSE'
     else if (distance <= 20) zone = 'APPROACHING'
