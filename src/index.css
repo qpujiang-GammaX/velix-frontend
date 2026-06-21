@@ -1,7 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Velix Brand Colors */
   --blue-900: #050e1f;
   --blue-800: #081428;
   --blue-700: #0d1f3c;
@@ -49,6 +48,13 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
+
+  /* Minimum comfortable touch target size */
+  --touch-target: 44px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 html, body, #root {
@@ -57,6 +63,22 @@ html, body, #root {
   color: var(--text-primary);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  position: relative;
+}
+
+/* Prevent any element from causing horizontal scroll */
+* {
+  max-width: 100%;
+}
+
+img, svg, video {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Scrollbar */
@@ -86,7 +108,20 @@ body::before {
   z-index: 0;
 }
 
-#root { position: relative; z-index: 1; }
+#root { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; }
 
-/* Utility */
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Touch-friendly tap targets globally for buttons and links */
+button, a {
+  touch-action: manipulation;
+}
+
+/* Mobile-first responsive helpers, used across pages via inline style + these utility classes */
+@media (max-width: 768px) {
+  body::before { background-size: 32px 32px; }
+}
+
+@media (max-width: 480px) {
+  ::-webkit-scrollbar { width: 0; height: 0; }
+}
