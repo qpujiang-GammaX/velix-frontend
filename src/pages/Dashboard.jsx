@@ -7,6 +7,7 @@ import AIRadar from '../components/AIRadar'
 
 const API = import.meta.env.VITE_API_URL || 'https://gammax-backend-production.up.railway.app'
 const PAIRS = ['XAU/USD', 'EUR/USD', 'GBP/USD', 'USD/JPY', 'USOIL', 'US500']
+const PAIR_SHORT = { 'XAU/USD': 'XAU', 'EUR/USD': 'EUR', 'GBP/USD': 'GBP', 'USD/JPY': 'JPY', 'USOIL': 'OIL', 'US500': 'S&P' }
 
 export default function Dashboard() {
   const [signals, setSignals]   = useState([])
@@ -16,17 +17,21 @@ export default function Dashboard() {
   const [activePair, setActivePair] = useState('XAU/USD')
   const [error, setError]       = useState(null)
   const [mobileTab, setMobileTab] = useState('chart') // 'chart' | 'analysis' | 'radar'
+  const [diagnostics, setDiagnostics] = useState([])
 
   const fetchData = useCallback(async () => {
     try {
-      const [s, h] = await Promise.all([
+      const [s, h, d] = await Promise.all([
         fetch(`${API}/api/signals/all`),
         fetch(`${API}/api/signals/heatmap`),
+        fetch(`${API}/api/signals/diagnostics`),
       ])
       const sd = await s.json()
       const hd = await h.json()
+      const dd = await d.json()
       if (sd.success) setSignals(sd.signals)
       if (hd.success) setHeatmap(hd.heatmap)
+      if (dd.success) setDiagnostics(dd.diagnostics || [])
       setLastUpdate(new Date())
       setError(null)
     } catch {
@@ -150,10 +155,11 @@ export default function Dashboard() {
             border: '1px solid var(--border)',
           }} className="mobile-tabs">
             {[
-              { key: 'chart', label: '📊 Chart' },
-              { key: 'analysis', label: '🤖 Analysis' },
-              { key: 'radar', label: '📡 Radar' },
-            ].map(tab => (
+            { key: 'chart',  label: '📊 Chart' },
+            { key: 'analysis', label: '🤖 Analysis' },
+            { key: 'radar',  label: '📡 Radar' },
+            { key: 'diag',   label: '🔬 Diag' },
+          ].map(tab => (
               <button key={tab.key} onClick={() => setMobileTab(tab.key)} style={{
                 flex: 1, padding: '8px 4px', borderRadius: 8,
                 border: 'none', cursor: 'pointer',
@@ -281,6 +287,67 @@ export default function Dashboard() {
                   <HeatmapTable data={heatmap} activePair={activePair} onSelect={setActivePair} />
                 </div>
               </div>
+
+
+{/* Diagnostics panel */}
+              <div className={`mobile-panel ${mobileTab === 'diag' ? 'mobile-active' : ''}`}>
+                {diagnostics.length > 0 && (
+                  <div style={{ background: 'var(--blue-800)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+                    <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', background: 'rgba(249,115,22,0.05)' }}>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600, color: 'var(--orange-400)', letterSpacing: 1 }}>
+                        🔬 LIVE DIAGNOSTICS
+                      </span>
+                    </div>
+                    {diagnostics.map((d, i) => {
+                      const h4Color = d.h4_trend === 'BULLISH' ? 'var(--green)' :
+                                      d.h4_trend === 'BEARISH' ? 'var(--red)'   :
+                                      'var(--orange-400)'
+                      const rsiColor = d.rsi_extreme ? (d.rsi_watching === 'BUY' ? 'var(--green)' : 'var(--red)') :
+                                       d.rsi_distance_to_extreme < 10 ? 'var(--orange-400)' : 'var(--text-secondary)'
+                      return (
+                        <div key={d.symbol} style={{
+                          padding: '10px 16px',
+                          borderBottom: i < diagnostics.length - 1 ? '1px solid rgba(30,64,128,0.3)' : 'none',
+                          background: d.symbol === activePair ? 'rgba(249,115,22,0.04)' : 'transparent',
+                          cursor: 'pointer',
+                        }} onClick={() => setActivePair(d.symbol)}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, color: d.symbol === activePair ? 'var(--orange-400)' : 'var(--white)' }}>
+                                {PAIR_SHORT[d.symbol] || d.symbol}
+                              </span>
+                              {d.rsi_extreme && (
+                                <span style={{
+                                  fontFamily: 'var(--font-mono)', fontSize: 8, fontWeight: 700,
+                                  color: d.rsi_watching === 'BUY' ? 'var(--green)' : 'var(--red)',
+                                  padding: '1px 4px', borderRadius: 3,
+                                  background: d.rsi_watching === 'BUY' ? 'var(--green-dim)' : 'var(--red-dim)',
+                                  animation: 'pulse 1.5s ease infinite',
+                                }}>🔥 {d.rsi_watching}</span>
+                              )}
+                            </div>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: h4Color }}>
+                              {d.h4_trend === 'BULLISH' ? '▲' : d.h4_trend === 'BEARISH' ? '▼' : '—'} H4
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: rsiColor }}>
+                              RSI {d.rsi?.toFixed(1)} {d.rsi_extreme ? '⚡' : `(${d.rsi_watching} in ${d.rsi_distance_to_extreme?.toFixed(1)})`}
+                            </span>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: d.volatility_ok ? 'var(--green)' : 'var(--text-dim)' }}>
+                              {d.volatility_ok ? '✅ vol' : '⚠️ low vol'}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+
+
+              
             </div>
           </div>
         </>
